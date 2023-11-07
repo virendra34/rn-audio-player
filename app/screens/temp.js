@@ -11,10 +11,8 @@ import { pause, play, resume } from '../misc/audioController';
 
 const AudioList = () => {
     // const audioContext = useContext(AudioContext);
-    const audioContext = AudioContext._currentValue;
-    const {dataProvider, soundObj, playbackObj, currentItem, updateState} = AudioContext._currentValue;
-    // console.log(dataProvider);
-    // const { dataProvider, soundObj, playbackObj, currentItem, updateState } = useContext(AudioContext);
+    const audioContext = AudioContext;
+    const { dataProvider, soundObj, playbackObj, currentItem, updateState } = useContext(AudioContext);
     // console.log({dataProvider, soundObj, playbackObj, currentItem, updateState})
     const [state, setState] = useState({
         optionModalVisible: false,
@@ -43,8 +41,8 @@ const AudioList = () => {
     });
 
     const handleAudioPress = async (audio) => {
-        const { soundObj, playbackObj, currentItem, updateState } = audioContext;
-        console.log("here:");
+        // const { soundObj, playbackObj, currentItem, updateState } = audioContext;
+        // console.log(audioContext);
         // play for the first time
         if (soundObj === null) {
             console.log('playing audio: ', audio.filename);
