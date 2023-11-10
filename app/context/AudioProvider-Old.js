@@ -1,48 +1,43 @@
-import React, { useEffect, createContext, useState, Component } from 'react'
+import React, { useEffect, createContext, useState } from 'react'
 import * as MediaLibrary from 'expo-media-library'
 import { StyleSheet, Alert, View, Text } from 'react-native'
 import { DataProvider } from 'recyclerlistview';
 
 export const AudioContext = createContext();
-export default  class AudioProvider extends Component {
+const AudioProvider = ({ children }) => {
 
-    constructor(props) {
-        super(props);
+    const [audioFilesData, setAudioFilesData] = useState({
+        audioFiles: [],
+        permissionError: false,
+        dataProvider: new DataProvider((r1, r2) => r1 !== r2),
+        playbackObj: null,
+        soundObj: null,
+        currentItem: {},
+    });
 
-        this.state = {
-            audioFiles: [],
-            permissionError: false,
-            dataProvider: new DataProvider((r1, r2) => r1 !== r2),
-            playbackObj: null,
-            soundObj: null,
-            currentItem: {},
-        }
-    }
-
-    getAudioFiles = async () => {
+    const getAudioFiles = async () => {
         try {
-            const { dataProvider, audioFiles } = this.state;
-            // console.log({data:this.state});
+            const { dataProvider, audioFiles } = audioFilesData;
             let media = await MediaLibrary.getAssetsAsync({ mediaType: 'audio' });
             // media = await MediaLibrary.getAssetsAsync({ mediaType: 'audio', first: media.totalCount });
             // media = await MediaLibrary.getAssetsAsync({ mediaType: 'audio', first: 20, sortBy:['modificationTime'] });
             media = await MediaLibrary.getAssetsAsync({ mediaType: 'audio', first: 20 });
             console.log('Total audio files:', media.assets.length);
 
-            this.setState((prevState) => {
+            setAudioFilesData((prevState) => {
                 return {
                     ...prevState,
                     audioFiles: [...media.assets],
                     dataProvider: dataProvider.cloneWithRows([...media.assets])
                 }
             });
-            // this.setState((prevState) => { return { ...prevState, audioFiles: [...media.assets] } });
+            // setAudioFilesData((prevState) => { return { ...prevState, audioFiles: [...media.assets] } });
         } catch (err) {
             console.log(err.message);
         }
     }
 
-    permissionAlert = async () => {
+    const permissionAlert = async () => {
         Alert.alert("Permission Required", "Need storage permission to read audio files!", [
             {
                 text: 'Allow Access',
@@ -56,7 +51,7 @@ export default  class AudioProvider extends Component {
     }
 
 
-    getPermissions = async () => {
+    const getPermissions = async () => {
         // {
         //     "canAskAgain": true,
         //     "expires": "never",
@@ -66,11 +61,11 @@ export default  class AudioProvider extends Component {
         const permisson = await MediaLibrary.getPermissionsAsync();
         if (permisson.granted) {
             // read all media files
-            this.getAudioFiles();
+            getAudioFiles();
         }
 
         if (!permisson.granted && !permisson.canAskAgain) {
-            this.setState((prevState) => {
+            setAudioFilesData((prevState) => {
                 return {
                     ...prevState,
                     permissionError: true
@@ -89,7 +84,7 @@ export default  class AudioProvider extends Component {
             if (status === 'denied' && !canAskAgain) {
                 // show alert that app can't work without storage read permission
                 permissionAlert();
-                this.setState((prevState) => {
+                setAudioFilesData((prevState) => {
                     return {
                         ...prevState,
                         permissionError: true
@@ -99,7 +94,7 @@ export default  class AudioProvider extends Component {
 
             if (status === 'granted') {
                 // read all media files
-                this.getAudioFiles();
+                getAudioFiles();
             }
 
         }
@@ -107,34 +102,29 @@ export default  class AudioProvider extends Component {
         // console.log(permisson);
     }
 
-    // useEffect(() => {
-    //     getPermissions()
-    // }, []);
-    componentDidMount() {
-        this.getPermissions();
-    }
+    useEffect(() => {
+        getPermissions()
+    }, []);
 
-    updateState = (prevState = {}, newState = {}) => {
-        this.setState({ ...prevState, ...newState });
+    const updateState = (prevState = {}, newState = {}) => {
+        setAudioFilesData({ ...prevState, ...newState });
     }
     // const updateState = (prevState = {}, newState = {}) => {
-    //     this.setState({ ...prevState, "_currentValue": { ...prevState._currentValue, ...newState } });
+    //     setAudioFilesData({ ...prevState, "_currentValue": { ...prevState._currentValue, ...newState } });
     // }
 
-    render() {
-        const { audioFiles, dataProvider, permissionError, playbackObj, soundObj, currentItem } = this.state;
-
-        return permissionError ?
-            <View style={styles.container}>
-                <Text style={styles.alert}>This app won't work without storage permission!</Text>
-            </View> :
-            <AudioContext.Provider value={{ audioFiles, dataProvider, playbackObj, soundObj, currentItem, updateState: this.updateState }}>
-                {this.props.children}
-            </AudioContext.Provider>
-    }
-
+    const { audioFiles, dataProvider, permissionError, playbackObj, soundObj, currentItem } = audioFilesData;
+    return permissionError ?
+        <View style={styles.container}>
+            <Text style={styles.alert}>This app won't work without storage permission!</Text>
+        </View> :
+        <AudioContext.Provider value={{ audioFiles, dataProvider, playbackObj, soundObj, currentItem, updateState: updateState }}>
+            {children}
+        </AudioContext.Provider>
 
 }
+
+export default AudioProvider
 
 const styles = StyleSheet.create({
     container: {

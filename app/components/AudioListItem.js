@@ -1,56 +1,41 @@
-import { Dimensions, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import React from 'react';
 import { Entypo } from '@expo/vector-icons';
 import color from '../misc/color';
+import {fancyTimeFormat} from '../utils/formatTime';
 
-const AudioListItem = ({ title, duration, onOptionPress }) => {
+const AudioListItem = ({ title, duration, onOptionPress, onAudioPress }) => {
     return (
         <>
             <View style={styles.container}>
-                <View style={styles.leftContainer}>
-                    <View style={styles.thumbnail}>
-                        <View style={styles.thumbnailText}>
-                            <Text>{title?.slice(0, 1)?.toUpperCase()}</Text>
+                <TouchableWithoutFeedback onPress={onAudioPress}>
+                    <View style={styles.leftContainer}>
+                        <View style={styles.thumbnail}>
+                            <View style={styles.thumbnailText}>
+                                <Text>{title?.slice(0, 1)?.toUpperCase()}</Text>
+                            </View>
+                        </View>
+                        <View style={styles.titleContainer}>
+                            <View style={styles.title}>
+                                <Text numberOfLines={1}>{title}</Text>
+                                <Text style={styles.timeText}>{fancyTimeFormat(duration)}</Text>
+                            </View>
                         </View>
                     </View>
-                    <View style={styles.titleContainer}>
-                        <View style={styles.title}>
-                            <Text numberOfLines={1}>{title}</Text>
-                            <Text style={styles.timeText}>{fancyTimeFormat(duration)}</Text>
-                        </View>
-                    </View>
-                </View>
+                </TouchableWithoutFeedback>
                 <View style={styles.rightContainer}>
                     <Entypo
                         name="dots-three-vertical"
                         size={20}
                         color={color.FONT_MEDIUM}
                         onPress={onOptionPress}
+                        style={{ padding: 10 }}
                     />
                 </View>
             </View>
             <View style={styles.separator}></View>
         </>
     )
-}
-
-const fancyTimeFormat = (duration) => {
-    // Hours, minutes and seconds
-    const hrs = ~~(duration / 3600);
-    const mins = ~~((duration % 3600) / 60);
-    const secs = ~~duration % 60;
-
-    // Output like "1:01" or "4:03:59" or "123:03:59"
-    let response = "";
-
-    if (hrs > 0) {
-        response += "" + hrs + ":" + (mins < 10 ? "0" : "");
-    }
-
-    response += "" + mins + ":" + (secs < 10 ? "0" : "");
-    response += "" + secs;
-
-    return response;
 }
 
 export default AudioListItem
