@@ -12,7 +12,7 @@ const AudioProvider = ({ children }) => {
         dataProvider: new DataProvider((r1, r2) => r1 !== r2),
         playbackObj: null,
         soundObj: null,
-        currentItem: {},
+        currentAudio: {},
     });
 
     const getAudioFiles = async () => {
@@ -113,12 +113,12 @@ const AudioProvider = ({ children }) => {
     //     setAudioFilesData({ ...prevState, "_currentValue": { ...prevState._currentValue, ...newState } });
     // }
 
-    const { audioFiles, dataProvider, permissionError, playbackObj, soundObj, currentItem } = audioFilesData;
+    const { audioFiles, dataProvider, permissionError, playbackObj, soundObj, currentAudio } = audioFilesData;
     return permissionError ?
         <View style={styles.container}>
             <Text style={styles.alert}>This app won't work without storage permission!</Text>
         </View> :
-        <AudioContext.Provider value={{ audioFiles, dataProvider, playbackObj, soundObj, currentItem, updateState: updateState }}>
+        <AudioContext.Provider value={{ audioFiles, dataProvider, playbackObj, soundObj, currentAudio, updateState: updateState }}>
             {children}
         </AudioContext.Provider>
 

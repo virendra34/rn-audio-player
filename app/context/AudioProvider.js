@@ -4,7 +4,7 @@ import { StyleSheet, Alert, View, Text } from 'react-native'
 import { DataProvider } from 'recyclerlistview';
 
 export const AudioContext = createContext();
-export default  class AudioProvider extends Component {
+export default class AudioProvider extends Component {
 
     constructor(props) {
         super(props);
@@ -15,8 +15,13 @@ export default  class AudioProvider extends Component {
             dataProvider: new DataProvider((r1, r2) => r1 !== r2),
             playbackObj: null,
             soundObj: null,
-            currentItem: {},
+            currentAudio: {},
+            isPlaying: false,
+            currentAudioIndex: null,
+            playbackPosition: null,
+            playbackDuration: null,
         }
+        this.totalAudioCount = 0;
     }
 
     getAudioFiles = async () => {
@@ -27,6 +32,9 @@ export default  class AudioProvider extends Component {
             // media = await MediaLibrary.getAssetsAsync({ mediaType: 'audio', first: media.totalCount });
             // media = await MediaLibrary.getAssetsAsync({ mediaType: 'audio', first: 20, sortBy:['modificationTime'] });
             media = await MediaLibrary.getAssetsAsync({ mediaType: 'audio', first: 20 });
+            // this.totalAudioCount = media.totalCount;
+            this.totalAudioCount = parseInt(media.assets.length | 0);
+
             console.log('Total audio files:', media.assets.length);
 
             this.setState((prevState) => {
@@ -117,18 +125,43 @@ export default  class AudioProvider extends Component {
     updateState = (prevState = {}, newState = {}) => {
         this.setState({ ...prevState, ...newState });
     }
-    // const updateState = (prevState = {}, newState = {}) => {
-    //     this.setState({ ...prevState, "_currentValue": { ...prevState._currentValue, ...newState } });
-    // }
+    
+    loadPreviousAudio = async () => {
+        // TODO: load audio from AsyncStorage
+        let previousAudio = await AsyncStorage.getItem('previousAudio');
+        let currentAudio;
+        let currentAudioIndex;
+
+        if (previousAudio === null) {
+            currentAudio = this.state.audioFiles[0];
+            currentAudioIndex = 0;
+        } else {
+            previousAudio = JSON.parse(previousAudio);
+            currentAudio = previousAudio.audio;
+            currentAudioIndex = previousAudio.index;
+        }
+    }
 
     render() {
-        const { audioFiles, dataProvider, permissionError, playbackObj, soundObj, currentItem } = this.state;
+        const { audioFiles, dataProvider, permissionError, playbackObj, soundObj, currentAudio, isPlaying, currentAudioIndex, playbackPosition, playbackDuration} = this.state;
 
         return permissionError ?
             <View style={styles.container}>
                 <Text style={styles.alert}>This app won't work without storage permission!</Text>
             </View> :
-            <AudioContext.Provider value={{ audioFiles, dataProvider, playbackObj, soundObj, currentItem, updateState: this.updateState }}>
+            <AudioContext.Provider value={{
+                audioFiles,
+                dataProvider,
+                playbackObj,
+                soundObj,
+                currentAudio,
+                isPlaying,
+                currentAudioIndex,
+                totalAudioCount: this.totalAudioCount,
+                playbackPosition: playbackPosition,
+                playbackDuration: playbackDuration,
+                updateState: this.updateState,
+            }}>
                 {this.props.children}
             </AudioContext.Provider>
     }

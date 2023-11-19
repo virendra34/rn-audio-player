@@ -12,8 +12,8 @@ import { pause, play, resume } from '../misc/audioController';
 const AudioList = () => {
     // const audioContext = useContext(AudioContext);
     const audioContext = AudioContext;
-    const { dataProvider, soundObj, playbackObj, currentItem, updateState } = useContext(AudioContext);
-    // console.log({dataProvider, soundObj, playbackObj, currentItem, updateState})
+    const { dataProvider, soundObj, playbackObj, currentAudio, updateState } = useContext(AudioContext);
+    // console.log({dataProvider, soundObj, playbackObj, currentAudio, updateState})
     const [state, setState] = useState({
         optionModalVisible: false,
     });
@@ -41,7 +41,7 @@ const AudioList = () => {
     });
 
     const handleAudioPress = async (audio) => {
-        // const { soundObj, playbackObj, currentItem, updateState } = audioContext;
+        // const { soundObj, playbackObj, currentAudio, updateState } = audioContext;
         // console.log(audioContext);
         // play for the first time
         if (soundObj === null) {
@@ -54,13 +54,13 @@ const AudioList = () => {
             //         ...prevState,
             //         playbackObj: playbackObj,
             //         soundObj: soundObj,
-            //         currentItem: audio,
+            //         currentAudio: audio,
             //     }
             // });
             return updateState(audioContext, {
                 playbackObj: playbackObj,
                 soundObj: soundObj,
-                currentItem: audio,
+                currentAudio: audio,
             });
         }
         // pause if already playing
@@ -77,11 +77,11 @@ const AudioList = () => {
             return updateState(audioContext, {
                 playbackObj: playbackObj,
                 soundObj: soundObj,
-                currentItem: audio,
+                currentAudio: audio,
             });
         }
         // resume
-        if (currentItem?.id === audio.id && soundObj.isLoaded && !soundObj.isPlaying) {
+        if (currentAudio?.id === audio.id && soundObj.isLoaded && !soundObj.isPlaying) {
             console.log('resuming: ', audio.filename, "playable duration: ", msToHMS(audio.playableDurationMillis), 'positionAt: ', msToHMS(audio.positionMillis));
             const soundObj = await resume(playbackObj);
             // return setState((prevState) => {
@@ -93,7 +93,7 @@ const AudioList = () => {
             return updateState(audioContext, {
                 playbackObj: playbackObj,
                 soundObj: soundObj,
-                currentItem: audio,
+                currentAudio: audio,
             });
         }
     }
@@ -105,7 +105,7 @@ const AudioList = () => {
         onOptionPress={() => setState((prevState) => {
             return {
                 ...prevState,
-                currentItem: item,
+                currentAudio: item,
                 optionModalVisible: true
             }
         })}>
@@ -131,7 +131,7 @@ const AudioList = () => {
     //     </RecyclerListView>
     //     <OptionModal
     //         visible={state.optionModalVisible}
-    //         currentItem={currentItem}
+    //         currentAudio={currentAudio}
     //         onClose={onClose}
     //         optionsBtns={{ onPressPlayBtn, onPressAddToPlayListBtn }}
     //     />
@@ -147,7 +147,7 @@ const AudioList = () => {
                 </RecyclerListView>
                 <OptionModal
                     visible={state.optionModalVisible}
-                    currentItem={currentItem}
+                    currentAudio={currentAudio}
                     onClose={onClose}
                     optionsBtns={{ onPressPlayBtn, onPressAddToPlayListBtn }}
                 />

@@ -2,17 +2,27 @@ import { Dimensions, StyleSheet, Text, TouchableWithoutFeedback, View } from 're
 import React from 'react';
 import { Entypo } from '@expo/vector-icons';
 import color from '../misc/color';
-import {fancyTimeFormat} from '../utils/formatTime';
+import { fancyTimeFormat } from '../utils/formatTime';
 
-const AudioListItem = ({ title, duration, onOptionPress, onAudioPress }) => {
+const AudioListItem = ({ title, duration, onOptionPress, onAudioPress, isPlaying, activeListItem }) => {
+
+    const getThumbnailtext = (title) => {
+        return <Text>{title?.slice(0, 1)?.toUpperCase()}</Text>
+    }
+
+    const renderPlayPauseIcon = (isPlaying) => {
+        if (!isPlaying) return <Entypo name="controller-play" size={24} color={color.ACTIVE_FONT} />;
+        else return <Entypo name="controller-paus" size={24} color={color.ACTIVE_FONT} />
+    }
+
     return (
         <>
             <View style={styles.container}>
                 <TouchableWithoutFeedback onPress={onAudioPress}>
                     <View style={styles.leftContainer}>
-                        <View style={styles.thumbnail}>
+                        <View style={[styles.thumbnail, {backgroundColor: activeListItem ? color.ACTIVE_BG : color.FONT_LIGHT}]}>
                             <View style={styles.thumbnailText}>
-                                <Text>{title?.slice(0, 1)?.toUpperCase()}</Text>
+                                {activeListItem ? renderPlayPauseIcon(isPlaying) : getThumbnailtext(title)}
                             </View>
                         </View>
                         <View style={styles.titleContainer}>

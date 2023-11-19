@@ -2,13 +2,12 @@ import { Modal, StatusBar, StyleSheet, Text, TouchableWithoutFeedback, View } fr
 import React from 'react'
 import color from '../misc/color'
 
-const OptionModal = ({ visible, currentItem, optionsBtns, onClose }) => {
-    // console.log({visible, currentItem, optionsBtns, onClose});
+const OptionModal = ({ visible, currentAudio, optionsBtns, onClose }) => {
     return <>
         {/* <StatusBar hidden={visible} /> */}
         <Modal animationType='slide' transparent visible={visible}>
             <View style={styles.modal}>
-                <Text style={styles.title} numberOfLines={2}>{currentItem?.filename}</Text>
+                <Text style={styles.title} numberOfLines={2}>{currentAudio?.filename}</Text>
                 <View styles={styles.optionContainer}>
                     <TouchableWithoutFeedback onPress={optionsBtns.onPressPlayBtn}>
                         <Text style={styles.option}>Play</Text>
